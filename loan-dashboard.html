@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Distressed Loan Acquisition Dashboard</title>
+<!-- Include Tailwind via CDN for quick prototyping -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Include Chart.js for Gantt chart rendering -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Custom styles for colored chips */
+    .chip {
+      @apply px-2 py-1 text-xs font-medium rounded-full;
+    }
+  </style>
+<style>
+  /* compact, Access-like density */
+  #dd-loan-edit-panel input,
+  #dd-loan-edit-panel select { height: 26px; line-height: 26px; }
+  #dd-loan-edit-panel label { color:#111827; }
+  #dd-loan-edit-panel .field label { font-size: 11px; }
+  #dd-loan-edit-panel .field input,
+  #dd-loan-edit-panel .field select { font-size: 12px; padding: 2px 6px; }
+  #dd-loan-edit-panel .group-title { font-size: 12px; font-weight:600; color:#374151 }
+  #dd-loan-edit-panel .grid-tight { grid-gap: 6px; }
+</style>
+<style>
+  /* Sectioned loan panel styling */
+  #dd-loan-edit-panel .section-card {
+    @apply border rounded-lg p-3 mb-3 bg-white;
+  }
+  #dd-loan-edit-panel .section-title {
+    @apply text-sm font-semibold text-gray-700 mb-2;
+  }
+  #dd-loan-edit-panel .grid-tight { grid-gap: 6px; }
+</style>
+<style>
+  /* Ultra-dense form layout */
+  #dd-loan-edit-panel .section-card { padding: 0.5rem; margin-bottom: 0.5rem; }
+  #dd-loan-edit-panel .section-title { font-size: 12px; margin-bottom: 0.25rem; }
+  #dd-loan-edit-panel .grid-tight { grid-gap: 4px; }
+  #dd-loan-edit-panel label { font-size: 11px; line-height: 1.1; }
+  #dd-loan-edit-panel input,
+  #dd-loan-edit-panel select { height: 22px; line-height: 22px; font-size: 12px; padding: 1px 6px; }
+  #dd-loan-edit-panel h4 { margin-bottom: 0.25rem; }
+</style>
+
+
+<style>
+  .dark body { background-color: #000000; color: #e5e7eb; }
+  .dark aside { background-color: #000000 !important; }
+  .dark .bg-white { background-color: #0a0a0a !important; }
+  .dark .bg-gray-100 { background-color: #0f0f0f !important; }
+  .dark .bg-gray-50 { background-color: #0a0a0a !important; }
+  .dark .text-gray-900 { color: #e5e7eb !important; }
+  .dark .text-gray-700 { color: #d1d5db !important; }
+  .dark .text-gray-600 { color: #cbd5e1 !important; }
+  .dark .text-gray-500 { color: #9ca3af !important; }
+  .dark .shadow { box-shadow: 0 1px 2px rgba(0,0,0,0.7), 0 4px 6px rgba(0,0,0,0.6) !important; }
+  .dark .border, .dark .border-l-4 { border-color: #1f2937 !important; }
+  .dark table { color: #e5e7eb; }
+  .dark thead tr { background-color: #0f172a !important; }
+  .dark tbody tr { border-color: #1f2937 !important; }
+  .dark tbody tr:hover { background-color: #0a0a0a !important; }
+  .dark .section-title { color: #d1d5db !important; }
+  .dark input, .dark select {
+    background-color: #000000;
+    color: #e5e7eb;
+    border-color: #1f2937;
+  }
+  .dark input::placeholder { color: #6b7280; }
+  body { background-color: #f3f4f6; }
+</style>
+
+
+<style id="dark-overrides">
+  /* Force white text in dark mode for legibility */
+  .dark, .dark body { color: #ffffff !important; }
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+  .dark p, .dark span, .dark div, .dark li, .dark label,
+  .dark th, .dark td, .dark a, .dark button { color: #ffffff !important; }
+
+  /* Inputs & selects: keep white text and dim placeholders */
+  .dark input, .dark select, .dark textarea {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+    border-color: #1f2937 !important;
+  }
+  .dark input::placeholder, .dark textarea::placeholder { color: #94a3b8 !important; }
+
+  /* Shaded areas (cards, table headers, chip backgrounds) */
+  .dark .bg-gray-100, .dark thead tr,
+  .dark .bg-gray-50 { background-color: #121212 !important; color: #ffffff !important; }
+  .dark .bg-white { background-color: #0a0a0a !important; color: #ffffff !important; }
+
+  /* Sidebar links and active states */
+  .dark #side-nav a { color: #e5e7eb !important; }
+  .dark #side-nav .bg-blue-100 { background-color: rgba(59,130,246,0.25) !important; color: #ffffff !important; }
+  .dark #side-nav .hover\:bg-gray-200:hover { background-color: #111827 !important; color: #ffffff !important; }
+
+  /* Chips / badges: ensure high-contrast text */
+  .dark .chip { color: #ffffff !important; }
+
+  /* Table borders and row hovers */
+  .dark tbody tr { border-color: #2b2b2b !important; }
+  .dark tbody tr:hover { background-color: #0f0f0f !important; }
+
+  /* KPI captions */
+  .dark .text-gray-500, .dark .text-gray-600, .dark .text-gray-700, .dark .text-gray-900 { color: #ffffff !important; }
+</style>
+
+</head>
+<body class="font-sans text-gray-900 bg-gray-100 dark:bg-gray-900 dark:text-gray-100">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-56 bg-white p-4 shadow-sm">
+<div class="text-2xl font-bold mb-1">AcqCore</div>
+
+<button aria-label="Toggle theme" class="mt-2 inline-flex items-center justify-center h-8 w-8 rounded-md border hover:bg-gray-200 dark:hover:bg-gray-800" id="theme-toggle">
+<svg class="h-5 w-5 block dark:hidden" fill="none" id="icon-sun" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="4" stroke-width="2"></circle>
+<path d="M12 2v2m0 16v2M4 12H2m20 0h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M7.5 17.5L5 19" stroke-linecap="round" stroke-width="2"></path>
+</svg>
+<svg class="h-5 w-5 hidden dark:block" fill="none" id="icon-moon" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+
+<div class="mb-5"></div>
+<nav class="space-y-2 text-sm" id="side-nav">
+<!-- The data-section attribute links a nav item to its section below -->
+<!-- Removed Home entry; Project Dashboard is the landing page -->
+<a class="nav-item active flex items-center px-3 py-2 rounded-md font-medium bg-blue-100 text-blue-600" data-section="dashboard" href="#" id="nav-dashboard">Project Dashboard</a>
+<a class="nav-item flex items-center px-3 py-2 rounded-md hover:bg-gray-200" data-section="due-diligence" href="#" id="nav-due-diligence">Due Diligence</a>
+<a class="nav-item flex items-center px-3 py-2 rounded-md hover:bg-gray-200" data-section="bids" href="#" id="nav-bids">Bids &amp; Auctions</a>
+<a class="nav-item flex items-center px-3 py-2 rounded-md hover:bg-gray-200" data-section="analysis" href="#" id="nav-analysis">Data Analysis</a>
+<a class="nav-item flex items-center px-3 py-2 rounded-md hover:bg-gray-200" data-section="data-room" href="#" id="nav-data-room">Data Room</a>
+<a class="nav-item flex items-center px-3 py-2 rounded-md hover:bg-gray-200" data-section="team-tasks" href="#" id="nav-team-tasks">Team Tasks</a>
+</nav>
+<!-- Pipeline metrics summary -->
+<div class="mt-8 space-y-4">
+<div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-md">
+<div class="text-sm text-blue-700">Active Projects</div>
+<div class="text-xl font-bold">5</div>
+</div>
+<div class="bg-green-50 border-l-4 border-green-500 p-3 rounded-md">
+<div class="text-sm text-green-700">Pending Bids</div>
+<div class="text-xl font-bold">3</div>
+</div>
+<div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded-md">
+<div class="text-sm text-yellow-700">DD Items Due</div>
+<div class="text-xl font-bold">12</div>
+</div>
+</div>
+<!-- User info -->
+<div class="mt-auto pt-8">
+<div class="flex items-center space-x-3">
+<div class="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center font-semibold text-gray-600">AS</div>
+<div>
+<div class="font-bold">Alex Smith</div>
+<div class="text-xs text-gray-500">Senior Analyst</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main content -->
+<main class="flex-1 p-8 overflow-y-auto">
+<!-- Dashboard header (title and KPI cards). This container is hidden when non-dashboard sections are active -->
+<div id="dashboard-header">
+<h1 class="text-3xl font-bold mb-6">Project Dashboard</h1>
+<!-- KPI cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="bg-white rounded-lg p-4 shadow">
+<div class="text-sm text-gray-500">Active Projects</div>
+<div class="text-3xl font-bold mt-1">5</div>
+</div>
+<div class="bg-white rounded-lg p-4 shadow">
+<div class="text-sm text-gray-500">Pipeline Value</div>
+<div class="text-3xl font-bold mt-1">$1.0B</div>
+</div>
+<div class="bg-white rounded-lg p-4 shadow">
+<div class="text-sm text-gray-500">Pending Bids</div>
+<div class="text-3xl font-bold mt-1">3</div>
+</div>
+<div class="bg-white rounded-lg p-4 shadow">
+<div class="text-sm text-gray-500">Overdue DD Items</div>
+<div class="text-3xl font-bold mt-1">8</div>
+</div>
+</div>
+</div>
+<!-- Main content grid -->
+<div class="flex flex-col lg:flex-row gap-6" id="section-container">
+<!-- The Home section has been removed to simplify the dashboard -->
+<!-- Section: Dashboard (default visible) -->
+<div class="section flex-1" id="section-dashboard">
+<!-- Project & Relationship selection will be placed inside the table container -->
+<!-- Row for table and side panels -->
+<div class="flex flex-col lg:flex-row gap-6">
+<!-- Active loan pools table -->
+<div class="flex-1">
+<!-- Search controls removed: show all active projects by default -->
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold">Active Projects (5)</h2>
+<button class="text-blue-600 hover:underline text-sm">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="min-w-full bg-white shadow rounded-lg">
+<thead>
+<tr class="bg-gray-100 text-left text-sm uppercase">
+<th class="px-4 py-3">Project</th>
+<th class="px-4 py-3">Size</th>
+<th class="px-4 py-3">Status</th>
+<th class="px-4 py-3">Progress</th>
+<th class="px-4 py-3">Deadline</th>
+</tr>
+</thead>
+<tbody class="text-sm" id="loan-table-body">
+<!-- Loan rows will be inserted here dynamically -->
+</tbody>
+</table>
+</div>
+</div>
+<!-- Side panels for dashboard -->
+<div class="w-full lg:w-80 space-y-6">
+<!-- Upcoming deadlines -->
+<div class="bg-white rounded-lg p-4 shadow">
+<h3 class="font-bold mb-3">Upcoming Deadlines</h3>
+<ul class="space-y-2 text-sm">
+<li class="flex justify-between">
+<span>Harbor Point Portfolio</span>
+<span class="text-gray-500">Aug 15</span>
+</li>
+<li class="flex justify-between">
+<span>Metro Retail Collection</span>
+<span class="text-gray-500">Aug 18</span>
+</li>
+<li class="flex justify-between">
+<span>Office Tower Portfolio</span>
+<span class="text-gray-500">Aug 22</span>
+</li>
+</ul>
+</div>
+<!-- Team activity -->
+<div class="bg-white rounded-lg p-4 shadow">
+<h3 class="font-bold mb-3">Team Activity</h3>
+<ul class="space-y-4 text-sm">
+<li>
+<span class="font-semibold text-blue-700">SM</span>
+<span class="ml-2">Sarah completed property analysis</span>
+<span class="block text-xs text-gray-500 ml-8">2h ago</span>
+</li>
+<li>
+<span class="font-semibold text-green-700">MC</span>
+<span class="ml-2">Mike submitted final bid</span>
+<span class="block text-xs text-gray-500 ml-8">4h ago</span>
+</li>
+<li>
+<span class="font-semibold text-purple-700">JR</span>
+<span class="ml-2">Jennifer updated financial model</span>
+<span class="block text-xs text-gray-500 ml-8">6h ago</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- End dashboard side panels -->
+</div> <!-- close row for table and side panels -->
+</div> <!-- end section-dashboard -->
+<!-- Loan detail section: appears when a loan row is clicked -->
+<div class="mt-6 hidden" id="loan-details">
+<h3 class="text-xl font-bold mb-4">Loan Details: <span id="loan-name"></span></h3>
+<nav class="flex space-x-3 border-b mb-4 text-sm" id="loan-tabs">
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="loan-info" href="#">Loan</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="borrower-info" href="#">Borrower</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="collateral-info" href="#">Collateral</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="comments-info" href="#">Comments</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="projections-info" href="#">Projections</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="overview-info" href="#">Overview</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="strategy-info" href="#">Strategy</a>
+<a class="loan-tab py-2 px-3 border-b-2 border-transparent" data-loan-section="title-info" href="#">Title Work</a>
+</nav>
+<div class="text-sm" id="loan-section-container">
+<div class="loan-section" id="loan-info">Loan information appears here.</div>
+<div class="loan-section hidden" id="borrower-info">Borrower information appears here.</div>
+<div class="loan-section hidden" id="collateral-info">Collateral information appears here.</div>
+<div class="loan-section hidden" id="comments-info">Comments and document verification appears here.</div>
+<div class="loan-section hidden" id="projections-info">Cash flow projections for models appear here.</div>
+<div class="loan-section hidden" id="overview-info">Overview of the relationship and collateral appears here.</div>
+<div class="loan-section hidden" id="strategy-info">Asset strategy appears here.</div>
+<div class="loan-section hidden" id="title-info">Title work and lien verification appears here.</div>
+</div>
+</div>
+<!-- End Loan detail section -->
+<!-- Section: Due Diligence -->
+<div class="section hidden flex-1" id="section-due-diligence">
+<h2 class="text-2xl font-bold mb-4">Due Diligence</h2>
+<!-- Project and Relationship selectors -->
+<div class="mb-2 flex flex-wrap space-x-2">
+<div>
+<label class="block text-sm font-medium mb-1" for="dd-project-select">Project (Deal)</label>
+<select class="border rounded px-2 py-1 text-sm" id="dd-project-select">
+<option value="">Select a project</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1" for="dd-relationship-select">Relationship</label>
+<select class="border rounded px-2 py-1 text-sm" disabled="" id="dd-relationship-select">
+<option value="">Select a relationship</option>
+</select>
+</div>
+</div>
+<!-- Detailed loan information table -->
+<div>
+<h3 class="text-xl font-bold mb-2">Loan Information</h3>
+<div class="overflow-x-auto">
+<table class="min-w-full bg-white shadow rounded-lg text-sm">
+<thead class="bg-gray-100">
+<tr>
+<th class="px-2 py-2">Loan Number</th>
+<th class="px-2 py-2">Relationship</th>
+<th class="px-2 py-2">Borrower</th>
+<th class="px-2 py-2">Origination Amount</th>
+<th class="px-2 py-2">UPB</th>
+<th class="px-2 py-2">Interest</th>
+<th class="px-2 py-2">Origination Date</th>
+<th class="px-2 py-2">Maturity Date</th>
+<th class="px-2 py-2">Rate</th>
+<th class="px-2 py-2">Rate Type</th>
+<th class="px-2 py-2">Rate Margin</th>
+<th class="px-2 py-2">Default Rate</th>
+<th class="px-2 py-2">Rate Index</th>
+</tr>
+</thead>
+<tbody id="dd-loan-table-body">
+<!-- Rows inserted dynamically -->
+</tbody>
+</table>
+</div>
+</div>
+<!-- Selection bar for editing panels -->
+<div class="mt-4 flex space-x-2" id="dd-selection-bar">
+<button class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none" id="dd-btn-loan">Loan</button>
+<!-- Future buttons for borrower, collateral, etc., can be added here -->
+</div>
+<!-- Loan editing panel (hidden by default) -->
+<div class="mt-4 p-3 bg-white rounded-lg shadow hidden" id="dd-loan-edit-panel">
+<h4 class="text-base font-semibold">Edit Loan Details</h4>
+<div class="grid grid-cols-12 gap-3">
+<!-- LEFT COLUMN -->
+<div class="col-span-12 lg:col-span-6 space-y-2">
+<!-- Identifiers -->
+<div class="section-card border rounded-lg bg-white">
+<div class="section-title">Identifiers</div>
+<div class="grid grid-cols-12 grid-tight items-end">
+<div class="col-span-3 field">
+<label>Loan Number</label>
+<input class="border rounded w-28" id="edit-loan-number" readonly="" type="text"/>
+</div>
+<div class="col-span-3 field">
+<label>Pool</label>
+<input class="border rounded w-28" id="edit-pool" readonly="" type="text"/>
+</div>
+<div class="col-span-3 field">
+<label>Relationship</label>
+<input class="border rounded w-32" id="edit-relationship" readonly="" type="text"/>
+</div>
+<div class="col-span-3 field">
+<label>Borrower</label>
+<input class="border rounded w-full" id="edit-borrower" type="text"/>
+</div>
+</div>
+</div>
+<!-- Collateral -->
+<div class="section-card border rounded-lg bg-white">
+<div class="section-title">Collateral</div>
+<div class="grid grid-cols-12 grid-tight items-end">
+<div class="col-span-12 field">
+<label>Address 1</label>
+<input class="border rounded w-full" id="edit-address1" placeholder="Street address line 1" type="text"/>
+</div>
+<div class="col-span-12 field">
+<label>Address 2</label>
+<input class="border rounded w-full" id="edit-address2" placeholder="Street address line 2" type="text"/>
+</div>
+<!-- Hidden legacy field to preserve existing JS logic -->
+<input id="edit-address" type="hidden"/>
+<div class="col-span-5 field">
+<label>City</label>
+<input class="border rounded w-full" id="edit-city" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>State</label>
+<input class="border rounded w-16" id="edit-state" type="text"/>
+</div>
+<div class="col-span-5 field">
+<label>Zip Code</label>
+<input class="border rounded w-24" id="edit-zip" type="text"/>
+</div>
+</div>
+</div>
+<!-- Amounts & Balances -->
+<div class="section-card border rounded-lg bg-white">
+<div class="section-title">Amounts &amp; Balances</div>
+<div class="grid grid-cols-12 grid-tight items-end">
+<div class="col-span-2 field">
+<label>Origination</label>
+<input class="border rounded w-24 text-right" id="edit-origination-amount" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>UPB</label>
+<input class="border rounded w-24 text-right" id="edit-upb" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>Escrow Bal.</label>
+<input class="border rounded w-24 text-right" id="edit-escrow-balance" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>Other Bal.</label>
+<input class="border rounded w-24 text-right" id="edit-other-balances" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>Payoff</label>
+<input class="border rounded w-24 text-right" id="edit-payoff" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>P&amp;I Pmt</label>
+<input class="border rounded w-24 text-right" id="edit-pi-payment" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN -->
+<div class="col-span-12 lg:col-span-6 space-y-2">
+<!-- Rates & Terms -->
+<div class="section-card border rounded-lg bg-white">
+<div class="section-title">Rates &amp; Terms</div>
+<div class="grid grid-cols-12 grid-tight items-end">
+<div class="col-span-2 field">
+<label>Type</label>
+<select class="border rounded w-24" id="edit-rate-type">
+<option>Fixed</option>
+<option>Floating</option>
+</select>
+</div>
+<div class="col-span-2 field">
+<label>Index</label>
+<select class="border rounded w-28" id="edit-rate-index">
+<option>SOFR</option>
+<option>Prime</option>
+<option>UST - 5 Year</option>
+</select>
+</div>
+<div class="col-span-2 field">
+<label>Margin</label>
+<input class="border rounded w-20 text-right" id="edit-rate-margin" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>Rate</label>
+<input class="border rounded w-20 text-right" id="edit-interest" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>Default</label>
+<input class="border rounded w-20 text-right" id="edit-default-rate" type="text"/>
+</div>
+<div class="col-span-2 field">
+<label>Escrow Pmt</label>
+<input class="border rounded w-24 text-right" id="edit-escrow-payment" type="text"/>
+</div>
+</div>
+</div>
+<!-- Key Dates (6 fields in one row) -->
+<div class="section-card border rounded-lg bg-white">
+<div class="section-title">Key Dates</div>
+<div class="grid grid-cols-12 grid-tight items-end">
+<div class="col-span-2 field">
+<label>Orig</label>
+<input class="border rounded w-full" id="edit-orig-date" type="date"/>
+</div>
+<div class="col-span-2 field">
+<label>Rate Chg</label>
+<input class="border rounded w-full" id="edit-rate-change-date" type="date"/>
+</div>
+<div class="col-span-2 field">
+<label>Last Pay</label>
+<input class="border rounded w-full" id="edit-last-payment-date" type="date"/>
+</div>
+<div class="col-span-2 field">
+<label>Last Int</label>
+<input class="border rounded w-full" id="edit-last-interest-date" type="date"/>
+</div>
+<div class="col-span-2 field">
+<label>Due</label>
+<input class="border rounded w-full" id="edit-due-date" type="date"/>
+</div>
+<div class="col-span-2 field">
+<label>Mat</label>
+<input class="border rounded w-full" id="edit-mat-date" type="date"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div> <!-- end section-due-diligence -->
+
+<!-- Section: Bids & Auctions -->
+<div class="section hidden flex-1" id="section-bids">
+<h2 class="text-2xl font-bold mb-4">Bids &amp; Auctions</h2>
+<p class="text-gray-600">Track and manage bid submissions and auction participation.</p>
+<div class="mt-4 bg-white rounded-lg p-6 shadow">
+<p class="text-gray-500">Bids content coming soon...</p>
+</div>
+</div>
+
+<!-- Section: Data Analysis -->
+<div class="section hidden flex-1" id="section-analysis">
+<h2 class="text-2xl font-bold mb-4">Data Analysis</h2>
+<p class="text-gray-600">Analyze portfolio performance and trends.</p>
+<div class="mt-4 bg-white rounded-lg p-6 shadow">
+<p class="text-gray-500">Analysis tools coming soon...</p>
+</div>
+</div>
+
+<!-- Section: Data Room -->
+<div class="section hidden flex-1" id="section-data-room">
+<h2 class="text-2xl font-bold mb-4">Data Room</h2>
+<p class="text-gray-600">Access and manage deal documents.</p>
+<div class="mt-4 bg-white rounded-lg p-6 shadow">
+<p class="text-gray-500">Data room access coming soon...</p>
+</div>
+</div>
+
+<!-- Section: Team Tasks -->
+<div class="section hidden flex-1" id="section-team-tasks">
+<h2 class="text-2xl font-bold mb-4">Team Tasks</h2>
+<p class="text-gray-600">Coordinate team activities and assignments.</p>
+<div class="mt-4 bg-white rounded-lg p-6 shadow">
+<p class="text-gray-500">Task management coming soon...</p>
+</div>
+</div>
+
+</div> <!-- end section-container -->
+</main>
+</div>
+
+<!-- Simple tab switching script -->
+<script>
+    // After the page loads, wire up the navigation so that each item shows its section
+    document.addEventListener('DOMContentLoaded', function () {
+      const navItems = document.querySelectorAll('#side-nav .nav-item');
+      const sections = document.querySelectorAll('#section-container .section');
+
+      function showSection(sectionId) {
+        // hide all sections
+        sections.forEach(sec => {
+          sec.classList.add('hidden');
+        });
+        // Show or hide the dashboard header depending on section
+        const dashboardHeader = document.getElementById('dashboard-header');
+        if (sectionId === 'dashboard') {
+          // show header for dashboard
+          if (dashboardHeader) {
+            dashboardHeader.classList.remove('hidden');
+          }
+        } else {
+          // hide header for other sections
+          if (dashboardHeader) {
+            dashboardHeader.classList.add('hidden');
+          }
+        }
+        // show selected section
+        const selected = document.getElementById('section-' + sectionId);
+        if (selected) {
+          selected.classList.remove('hidden');
+        }
+      }
+
+      navItems.forEach(item => {
+        item.addEventListener('click', function (e) {
+          e.preventDefault();
+          // Remove active state from all nav items
+          navItems.forEach(i => {
+            i.classList.remove('bg-blue-100', 'text-blue-600', 'font-medium');
+          });
+          // Add active state to clicked nav
+          item.classList.add('bg-blue-100', 'text-blue-600', 'font-medium');
+          // Show corresponding section
+          const sectionName = item.getAttribute('data-section');
+          showSection(sectionName);
+        });
+      });
+    });
+  </script>
+<!-- Data and dynamic behavior for project/relationship selection and loan detail tabs -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Sample data representing projects, relationships, and loans
+      const data = {
+        projects: [
+          {
+            id: 'metro',
+            name: 'Metro Office Portfolio',
+            relationships: [
+              {
+                id: 'rel1',
+                name: 'First National Bank',
+                    loans: [
+                      {
+                        id: 'loan1',
+                        pool: 'Metro Office Portfolio',
+                        size: '$245M UPB',
+                        loansCount: '18 loans',
+                        status: 'Due Diligence',
+                        statusClass: 'bg-purple-100 text-purple-700',
+                        progress: 0,
+                        deadline: 'over 1 year ago',
+                        relationship: 'First National Bank',
+                        location: 'New York Metro Area',
+                        priority: 'high',
+                        priorityClass: 'bg-orange-100 text-orange-600',
+                        borrower: 'Borrower A',
+                        collateral: 'Office buildings across NYC.',
+                        comments: 'All documents verified.',
+                        projections: 'Yearly cash flow projection placeholder.',
+                        overviewRel: 'Overview of the relationship with First National Bank.',
+                        overviewColl: 'Overview of the collateral for this loan.',
+                        strategy: 'Hold and improve occupancy.',
+                        title: 'Lien verified, first position.',
+                        // Additional loan details for due diligence table
+                        loanNumber: 'MO-1001',
+                        // Use full numeric values for origination amount and UPB with commas and two decimals
+                        originationAmount: '$300,000,000.00',
+                        upb: '$245,000,000.00',
+                        interest: '5.00%',
+                        // Dates in Month-Day-Year format
+                        originationDate: '01-01-2019',
+                        maturityDate: '01-01-2028',
+                        rate: '5.00%',
+                        rateType: 'Fixed',
+                        rateMargin: '1.25%',
+                        defaultRate: '8.00%',
+                        rateIndex: 'SOFR',
+                        // Additional editing fields
+                        address: '123 Main St, New York, NY',
+                        rateChangeDate: '01-01-2024',
+                        dueDate: '01-01-2028',
+                        lastPaymentDate: '12-01-2023',
+                        piPayment: '$2,000,000.00',
+                        escrowPayment: '$500,000.00',
+                        escrowBalance: '$1,000,000.00',
+                        otherBalances: '$0.00',
+                        payoff: '$250,000,000.00'
+                      },
+                      {
+                        id: 'loan4',
+                        pool: 'Metro Office Portfolio',
+                        size: '$180M UPB',
+                        loansCount: '10 loans',
+                        status: 'Due Diligence',
+                        statusClass: 'bg-purple-100 text-purple-700',
+                        progress: 0,
+                        deadline: 'over 1 year ago',
+                        relationship: 'First National Bank',
+                        location: 'New York Metro Area',
+                        priority: 'medium',
+                        priorityClass: 'bg-yellow-100 text-yellow-700',
+                        borrower: 'Borrower D',
+                        collateral: 'Additional office buildings across NYC.',
+                        comments: 'Initial review in progress.',
+                        projections: 'Yearly cash flow projection placeholder.',
+                        overviewRel: 'Overview of the relationship with First National Bank for second loan.',
+                        overviewColl: 'Overview of the collateral for this loan.',
+                        strategy: 'Evaluate renovation potential.',
+                        title: 'Lien verified, second position.',
+                        // Additional loan details for due diligence table
+                        loanNumber: 'MO-1002',
+                        originationAmount: '$400,000,000.00',
+                        upb: '$180,000,000.00',
+                        interest: '4.50%',
+                        originationDate: '02-15-2019',
+                        maturityDate: '02-15-2029',
+                        rate: '4.50%',
+                        rateType: 'Fixed',
+                        rateMargin: '1.50%',
+                        defaultRate: '7.75%',
+                        rateIndex: 'SOFR',
+                        // Additional editing fields
+                        address: '456 Second Ave, New York, NY',
+                        rateChangeDate: '02-15-2024',
+                        dueDate: '02-15-2029',
+                        lastPaymentDate: '01-15-2024',
+                        piPayment: '$2,200,000.00',
+                        escrowPayment: '$550,000.00',
+                        escrowBalance: '$1,100,000.00',
+                        otherBalances: '$50,000.00',
+                        payoff: '$200,000,000.00'
+                      }
+                    ]
+              }
+            ]
+          },
+          {
+            id: 'southeast',
+            name: 'Southeast Retail Collection',
+            relationships: [
+              {
+                id: 'rel2',
+                name: 'Regional Credit Union',
+                loans: [
+                  {
+                    id: 'loan2',
+                    pool: 'Southeast Retail Collection',
+                    size: '$156M UPB',
+                    loansCount: '24 loans',
+                    status: 'Bid Submitted',
+                    statusClass: 'bg-green-100 text-green-700',
+                    progress: 0,
+                    deadline: 'over 1 year ago',
+                    relationship: 'Regional Credit Union',
+                    location: 'Southeast US',
+                    priority: 'medium',
+                    priorityClass: 'bg-yellow-100 text-yellow-700',
+                    borrower: 'Borrower B',
+                    collateral: 'Retail centers across Southeast US.',
+                    comments: 'Pending review.',
+                    projections: 'Cash flow projection placeholder.',
+                    overviewRel: 'Overview of relationship with Regional Credit Union.',
+                    overviewColl: 'Overview of collateral for this loan.',
+                    strategy: 'Bid pending, evaluate further.',
+                    title: 'Lien status to be confirmed.',
+                    // Additional loan details for due diligence table
+                    loanNumber: 'SR-2002',
+                    originationAmount: '$180,000,000.00',
+                    upb: '$156,000,000.00',
+                    interest: '4.75%',
+                    originationDate: '03-01-2020',
+                    maturityDate: '03-01-2030',
+                    rate: '4.75%',
+                    rateType: 'Floating',
+                    rateMargin: '1.50%',
+                    defaultRate: '7.50%',
+                    rateIndex: 'SOFR'
+                    ,
+                    // Additional editing fields
+                    address: '789 Retail Plaza, Atlanta, GA',
+                    rateChangeDate: '03-01-2025',
+                    dueDate: '03-01-2030',
+                    lastPaymentDate: '02-01-2024',
+                    piPayment: '$1,800,000.00',
+                    escrowPayment: '$400,000.00',
+                    escrowBalance: '$900,000.00',
+                    otherBalances: '$10,000.00',
+                    payoff: '$160,000,000.00'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            id: 'california',
+            name: 'California Industrial Portfolio',
+            relationships: [
+              {
+                id: 'rel3',
+                name: 'Pacific Coast Bank',
+                loans: [
+                  {
+                    id: 'loan3',
+                    pool: 'California Industrial Portfolio',
+                    size: '$320M UPB',
+                    loansCount: '12 loans',
+                    status: 'Modeling',
+                    statusClass: 'bg-blue-100 text-blue-700',
+                    progress: 0,
+                    deadline: 'over 1 year ago',
+                    relationship: 'Pacific Coast Bank',
+                    location: 'California',
+                    priority: 'urgent',
+                    priorityClass: 'bg-red-100 text-red-700',
+                    borrower: 'Borrower C',
+                    collateral: 'Industrial properties across California.',
+                    comments: 'Urgent due diligence required.',
+                    projections: 'Projection placeholder.',
+                    overviewRel: 'Overview of relationship with Pacific Coast Bank.',
+                    overviewColl: 'Overview of collateral for this loan.',
+                    strategy: 'Modeling to determine hold vs sale.',
+                    title: 'Title work underway.',
+                    // Additional loan details for due diligence table
+                    loanNumber: 'CI-3003',
+                    originationAmount: '$350,000,000.00',
+                    upb: '$320,000,000.00',
+                    interest: '5.25%',
+                    originationDate: '07-01-2018',
+                    maturityDate: '07-01-2028',
+                    rate: '5.25%',
+                    rateType: 'Fixed',
+                    rateMargin: '1.75%',
+                    defaultRate: '8.50%',
+                    rateIndex: 'Prime'
+                    ,
+                    // Additional editing fields
+                    address: '101 Industrial Rd, Los Angeles, CA',
+                    rateChangeDate: '07-01-2025',
+                    dueDate: '07-01-2028',
+                    lastPaymentDate: '06-01-2024',
+                    piPayment: '$2,500,000.00',
+                    escrowPayment: '$600,000.00',
+                    escrowBalance: '$1,200,000.00',
+                    otherBalances: '$20,000.00',
+                    payoff: '$300,000,000.00'
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+
+      // Element references
+      const loanTableBody = document.getElementById('loan-table-body');
+      const loanDetails = document.getElementById('loan-details');
+      const loanNameEl = document.getElementById('loan-name');
+
+      // Flatten all loans across projects and relationships for default view
+      const allLoans = data.projects.flatMap(p =>
+        p.relationships.flatMap(r => r.loans)
+      );
+
+      // Populate the table with all loans on load
+      populateLoanTable(allLoans);
+
+      // Populate loan table with rows
+      function populateLoanTable(loans) {
+        loanTableBody.innerHTML = '';
+        loans.forEach(loan => {
+          const row = document.createElement('tr');
+          row.classList.add('border-t', 'cursor-pointer', 'hover:bg-gray-50');
+          row.setAttribute('data-loan-id', loan.id);
+          row.innerHTML = `
+            <td class="px-4 py-4">
+              <div class="font-bold">${loan.pool}</div>
+              <div class="text-xs text-gray-500">${loan.relationship}</div>
+              <div class="text-xs text-gray-600 mt-1">${loan.location}</div>
+              <span class="chip ${loan.priorityClass} mt-1 inline-block">${loan.priority}</span>
+            </td>
+            <td class="px-4 py-4">${loan.size}<br/><span class="text-xs text-gray-500">${loan.loansCount}</span></td>
+            <td class="px-4 py-4"><span class="chip ${loan.statusClass}">${loan.status}</span></td>
+            <td class="px-4 py-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-28 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div class="bg-yellow-500 h-full" style="width:${loan.progress}%"></div>
+                </div>
+                <span class="text-xs">${loan.progress}%</span>
+              </div>
+            </td>
+            <td class="px-4 py-4 text-red-600 font-medium">${loan.deadline}</td>
+          `;
+          loanTableBody.appendChild(row);
+        });
+      }
+
+      // Click on loan row to show details
+      loanTableBody.addEventListener('click', function (e) {
+        const row = e.target.closest('tr[data-loan-id]');
+        if (row) {
+          const loanId = row.getAttribute('data-loan-id');
+          // Find the selected loan from the flattened list
+          const loan = allLoans.find(l => l.id === loanId);
+          if (loan) {
+            showLoanDetails(loan);
+          }
+        }
+      });
+
+      // Populate loan detail sections
+      function showLoanDetails(loan) {
+        loanNameEl.textContent = loan.pool;
+        document.getElementById('loan-info').textContent = `Loan Size: ${loan.size}, Status: ${loan.status}, Deadline: ${loan.deadline}`;
+        document.getElementById('borrower-info').textContent = loan.borrower;
+        document.getElementById('collateral-info').textContent = loan.collateral;
+        document.getElementById('comments-info').textContent = loan.comments;
+        document.getElementById('projections-info').textContent = loan.projections;
+        document.getElementById('overview-info').innerHTML = `<strong>Relationship:</strong> ${loan.overviewRel}<br/><strong>Collateral:</strong> ${loan.overviewColl}`;
+        document.getElementById('strategy-info').textContent = loan.strategy;
+        document.getElementById('title-info').textContent = loan.title;
+        loanDetails.classList.remove('hidden');
+        // Set first tab active
+        activateLoanTab('loan-info');
+      }
+
+      // Second-level tab switching
+      const loanTabs = document.querySelectorAll('#loan-tabs .loan-tab');
+      const loanSections = document.querySelectorAll('#loan-section-container .loan-section');
+
+      function activateLoanTab(sectionId) {
+        loanTabs.forEach(tab => {
+          tab.classList.remove('border-blue-600', 'text-blue-600');
+          if (tab.getAttribute('data-loan-section') === sectionId) {
+            tab.classList.add('border-blue-600', 'text-blue-600');
+          }
+        });
+        loanSections.forEach(sec => {
+          sec.classList.add('hidden');
+          if (sec.id === sectionId) {
+            sec.classList.remove('hidden');
+          }
+        });
+      }
+
+      loanTabs.forEach(tab => {
+        tab.addEventListener('click', function (e) {
+          e.preventDefault();
+          const secId = tab.getAttribute('data-loan-section');
+          activateLoanTab(secId);
+        });
+      });
+
+      // Build the Gantt-style chart for the Home section
+      // Map status names to numeric values for chart representation
+      const statusMap = { 'Due Diligence': 1, 'Bid Submitted': 2, 'Modeling': 3 };
+      const statusNames = { 1: 'Due Diligence', 2: 'Bid Submitted', 3: 'Modeling' };
+      // Generate labels, status values, and colors based on the projects data
+      const labels = data.projects.map(p => p.name);
+      const statuses = data.projects.map(p => {
+        const loanStatus = p.relationships[0].loans[0].status;
+        return statusMap[loanStatus] || 0;
+      });
+      const colors = data.projects.map(p => {
+        const loanStatus = p.relationships[0].loans[0].status;
+        switch (loanStatus) {
+          case 'Due Diligence':
+            return 'rgba(168, 85, 247, 0.6)'; // purple
+          case 'Bid Submitted':
+            return 'rgba(34, 197, 94, 0.6)'; // green
+          case 'Modeling':
+            return 'rgba(59, 130, 246, 0.6)'; // blue
+          default:
+            return 'rgba(107, 114, 128, 0.6)'; // gray
+        }
+      });
+      // Expose our sample data globally for use in other sections (e.g., Due Diligence)
+      window.appData = data;
+      // The Gantt chart has been removed along with the home section.
+      // If you wish to re-enable a chart in the future, insert Chart.js initialization code here.
+    });
+  </script>
+<!-- Due Diligence selection logic -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ddProjectSelect = document.getElementById('dd-project-select');
+    const ddRelationshipSelect = document.getElementById('dd-relationship-select');
+    const ddLoanTableBody = document.getElementById('dd-loan-table-body');
+    // Only run if the Due Diligence selectors are present and appData is exposed
+    // Keep track of the current set of loans for the selected relationship
+    let currentLoans = [];
+    // Keep track of which loan row is selected in the Due Diligence table
+    // When null, the first loan will be used as a default for editing
+    let selectedLoanIndex = null;
+    if (ddProjectSelect && window.appData) {
+      // Populate project/deal dropdown
+      window.appData.projects.forEach(proj => {
+        const opt = document.createElement('option');
+        opt.value = proj.id;
+        opt.textContent = proj.name;
+        ddProjectSelect.appendChild(opt);
+      });
+      // When project changes, populate relationship dropdown and clear table
+      ddProjectSelect.addEventListener('change', function() {
+        ddRelationshipSelect.innerHTML = '<option value="">Select a relationship</option>';
+        ddRelationshipSelect.disabled = true;
+        ddLoanTableBody.innerHTML = '';
+        // Reset selected loans when switching projects
+        currentLoans = [];
+        selectedLoanIndex = null;
+        const proj = window.appData.projects.find(p => p.id === this.value);
+        if (proj) {
+          proj.relationships.forEach(rel => {
+            const opt = document.createElement('option');
+            opt.value = rel.id;
+            opt.textContent = rel.name;
+            ddRelationshipSelect.appendChild(opt);
+          });
+          ddRelationshipSelect.disabled = false;
+        }
+      });
+      // When relationship changes, populate loan quick info
+      ddRelationshipSelect.addEventListener('change', function() {
+        ddLoanTableBody.innerHTML = '';
+        // Reset selected loan index when switching relationships
+        selectedLoanIndex = null;
+        const proj = window.appData.projects.find(p => p.id === ddProjectSelect.value);
+        const rel = proj && proj.relationships.find(r => r.id === this.value);
+        if (rel) {
+          currentLoans = rel.loans || [];
+          populateDdTable(currentLoans);
+        }
+      });
+    }
+    // Helper to populate the quick info table
+    function populateDdTable(loans) {
+      // Clear existing rows
+      ddLoanTableBody.innerHTML = '';
+      loans.forEach((loan, index) => {
+        const row = document.createElement('tr');
+        row.classList.add('border-t', 'cursor-pointer');
+        // store index on the row for reference
+        row.setAttribute('data-loan-index', index);
+        row.innerHTML = `
+          <td class="px-2 py-2 font-bold">${loan.loanNumber || ''}</td>
+          <td class="px-2 py-2">${loan.relationship || ''}</td>
+          <td class="px-2 py-2">${loan.borrower || ''}</td>
+          <td class="px-2 py-2">${loan.originationAmount || ''}</td>
+          <td class="px-2 py-2">${loan.upb || ''}</td>
+          <td class="px-2 py-2">${loan.interest || ''}</td>
+          <td class="px-2 py-2">${loan.originationDate || ''}</td>
+          <td class="px-2 py-2">${loan.maturityDate || ''}</td>
+          <td class="px-2 py-2">${loan.rate || ''}</td>
+          <td class="px-2 py-2">${loan.rateType || ''}</td>
+          <td class="px-2 py-2">${loan.rateMargin || ''}</td>
+          <td class="px-2 py-2">${loan.defaultRate || ''}</td>
+          <td class="px-2 py-2">${loan.rateIndex || ''}</td>
+        `;
+        // Click handler to select a loan
+        row.addEventListener('click', function() {
+          // Update selected index
+          selectedLoanIndex = parseInt(this.getAttribute('data-loan-index'), 10);
+          // Remove highlight from all rows
+          ddLoanTableBody.querySelectorAll('tr').forEach(r => {
+            r.classList.remove('bg-blue-50');
+          });
+          // Highlight the selected row
+          this.classList.add('bg-blue-50');
+          // If the loan edit panel is visible, update its fields immediately
+          const panelVisible = loanEditPanel && !loanEditPanel.classList.contains('hidden');
+          if (panelVisible && currentLoans && currentLoans[selectedLoanIndex]) {
+            fillLoanEditFields(currentLoans[selectedLoanIndex]);
+          }
+        });
+        ddLoanTableBody.appendChild(row);
+      });
+    }
+
+    // Wire up the Loan button to display the editing panel
+    const ddBtnLoan = document.getElementById('dd-btn-loan');
+    const loanEditPanel = document.getElementById('dd-loan-edit-panel');
+    if (ddBtnLoan) {
+      ddBtnLoan.addEventListener('click', function() {
+        if (!loanEditPanel) return;
+        // Determine which loan to populate: use selectedLoanIndex if set, else default to first loan
+        let loan = null;
+        if (currentLoans && currentLoans.length > 0) {
+          if (selectedLoanIndex !== null && currentLoans[selectedLoanIndex]) {
+            loan = currentLoans[selectedLoanIndex];
+          } else {
+            loan = currentLoans[0];
+          }
+        }
+        if (loan) {
+          fillLoanEditFields(loan);
+          // Show the panel
+          loanEditPanel.classList.remove('hidden');
+        }
+      });
+    }
+
+    // Utility function to convert date from MM-DD-YYYY to YYYY-MM-DD format
+    function convertDateFormat(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        // Convert MM-DD-YYYY to YYYY-MM-DD
+        return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+      }
+      return dateStr;
+    }
+
+    // Utility function to fill all fields in the loan edit panel based on a loan object
+    function fillLoanEditFields(loan) {
+      document.getElementById('edit-loan-number').value = loan.loanNumber || '';
+      document.getElementById('edit-relationship').value = loan.relationship || '';
+      document.getElementById('edit-borrower').value = loan.borrower || '';
+      document.getElementById('edit-origination-amount').value = loan.originationAmount || '';
+      document.getElementById('edit-upb').value = loan.upb || '';
+      document.getElementById('edit-interest').value = loan.interest || '';
+      document.getElementById('edit-orig-date').value = convertDateFormat(loan.originationDate);
+      document.getElementById('edit-mat-date').value = convertDateFormat(loan.maturityDate);
+      document.getElementById('edit-address').value = loan.address || '';
+      document.getElementById('edit-rate-change-date').value = convertDateFormat(loan.rateChangeDate);
+      document.getElementById('edit-due-date').value = convertDateFormat(loan.dueDate);
+      document.getElementById('edit-last-payment-date').value = convertDateFormat(loan.lastPaymentDate);
+      document.getElementById('edit-pi-payment').value = loan.piPayment || '';
+      document.getElementById('edit-escrow-payment').value = loan.escrowPayment || '';
+      document.getElementById('edit-escrow-balance').value = loan.escrowBalance || '';
+      document.getElementById('edit-other-balances').value = loan.otherBalances || '';
+      document.getElementById('edit-payoff').value = loan.payoff || '';
+
+      // Optional: fill selects & extra fields for compact panel
+      document.getElementById('edit-rate-type').value = loan.rateType || 'Fixed';
+      document.getElementById('edit-rate-index').value = loan.rateIndex || 'SOFR';
+      document.getElementById('edit-rate-margin').value = loan.rateMargin || '';
+      document.getElementById('edit-default-rate').value = loan.defaultRate || '';
+      document.getElementById('edit-last-interest-date').value = convertDateFormat(loan.lastInterestDate);
+
+      document.getElementById('edit-pool').value = loan.pool || '';
+      document.getElementById('edit-address1').value = loan.address1 || '';
+      document.getElementById('edit-address2').value = loan.address2 || '';
+      document.getElementById('edit-city').value = loan.city || '';
+      document.getElementById('edit-state').value = loan.state || '';
+      document.getElementById('edit-zip').value = loan.zip || '';}
+  });
+  </script>
+
+<script>
+  (function() {
+    const pref = localStorage.getItem('acq_theme');
+    if (pref === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', function() {
+        const root = document.documentElement;
+        const isDark = root.classList.toggle('dark');
+        localStorage.setItem('acq_theme', isDark ? 'dark' : 'light');
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
