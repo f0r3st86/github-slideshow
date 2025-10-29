@@ -19,11 +19,11 @@
   /* compact, Access-like density */
   #dd-loan-edit-panel input,
   #dd-loan-edit-panel select { height: 26px; line-height: 26px; }
-  #dd-loan-edit-panel label { color:#111827; }
+  #dd-loan-edit-panel label { color: inherit; }
   #dd-loan-edit-panel .field label { font-size: 11px; }
   #dd-loan-edit-panel .field input,
   #dd-loan-edit-panel .field select { font-size: 12px; padding: 2px 6px; }
-  #dd-loan-edit-panel .group-title { font-size: 12px; font-weight:600; color:#374151 }
+  #dd-loan-edit-panel .group-title { font-size: 12px; font-weight:600; }
   #dd-loan-edit-panel .grid-tight { grid-gap: 6px; }
 </style>
 <style>
@@ -39,9 +39,9 @@
 <style>
   /* Ultra-dense form layout */
   #dd-loan-edit-panel .section-card { padding: 0.5rem; margin-bottom: 0.5rem; }
-  #dd-loan-edit-panel .section-title { font-size: 12px; margin-bottom: 0.25rem; }
+  #dd-loan-edit-panel .section-title { font-size: 12px; margin-bottom: 0.25rem; color: #374151; }
   #dd-loan-edit-panel .grid-tight { grid-gap: 4px; }
-  #dd-loan-edit-panel label { font-size: 11px; line-height: 1.1; }
+  #dd-loan-edit-panel label { font-size: 11px; line-height: 1.1; color: #374151; }
   #dd-loan-edit-panel input,
   #dd-loan-edit-panel select { height: 22px; line-height: 22px; font-size: 12px; padding: 1px 6px; }
   #dd-loan-edit-panel h4 { margin-bottom: 0.25rem; }
@@ -49,66 +49,207 @@
 
 
 <style>
-  .dark body { background-color: #000000; color: #e5e7eb; }
-  .dark aside { background-color: #000000 !important; }
-  .dark .bg-white { background-color: #0a0a0a !important; }
-  .dark .bg-gray-100 { background-color: #0f0f0f !important; }
-  .dark .bg-gray-50 { background-color: #0a0a0a !important; }
-  .dark .text-gray-900 { color: #e5e7eb !important; }
-  .dark .text-gray-700 { color: #d1d5db !important; }
-  .dark .text-gray-600 { color: #cbd5e1 !important; }
-  .dark .text-gray-500 { color: #9ca3af !important; }
-  .dark .shadow { box-shadow: 0 1px 2px rgba(0,0,0,0.7), 0 4px 6px rgba(0,0,0,0.6) !important; }
-  .dark .border, .dark .border-l-4 { border-color: #1f2937 !important; }
-  .dark table { color: #e5e7eb; }
-  .dark thead tr { background-color: #0f172a !important; }
-  .dark tbody tr { border-color: #1f2937 !important; }
-  .dark tbody tr:hover { background-color: #0a0a0a !important; }
-  .dark .section-title { color: #d1d5db !important; }
-  .dark input, .dark select {
-    background-color: #000000;
+  /* Base light mode styles */
+  body { background-color: #f3f4f6; color: #111827; }
+
+  /* Dark mode styles - accessible and properly contrasted */
+  .dark body {
+    background-color: #0f172a;
     color: #e5e7eb;
-    border-color: #1f2937;
   }
-  .dark input::placeholder { color: #6b7280; }
-  body { background-color: #f3f4f6; }
-</style>
 
+  .dark aside {
+    background-color: #1e293b !important;
+    border-right: 1px solid #334155;
+  }
 
-<style id="dark-overrides">
-  /* Force white text in dark mode for legibility */
-  .dark, .dark body { color: #ffffff !important; }
-  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
-  .dark p, .dark span, .dark div, .dark li, .dark label,
-  .dark th, .dark td, .dark a, .dark button { color: #ffffff !important; }
+  /* Card and container backgrounds */
+  .dark .bg-white {
+    background-color: #1e293b !important;
+    color: #e5e7eb !important;
+  }
 
-  /* Inputs & selects: keep white text and dim placeholders */
+  .dark .bg-gray-100 {
+    background-color: #0f172a !important;
+    color: #e5e7eb !important;
+  }
+
+  .dark .bg-gray-50 {
+    background-color: #1e293b !important;
+    color: #e5e7eb !important;
+  }
+
+  /* Text colors for dark mode */
+  .dark .text-gray-900 { color: #f1f5f9 !important; }
+  .dark .text-gray-700 { color: #cbd5e1 !important; }
+  .dark .text-gray-600 { color: #94a3af !important; }
+  .dark .text-gray-500 { color: #64748b !important; }
+
+  /* Headings */
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #f1f5f9 !important;
+  }
+
+  /* Form elements */
   .dark input, .dark select, .dark textarea {
-    color: #ffffff !important;
-    background-color: #000000 !important;
-    border-color: #1f2937 !important;
+    background-color: #0f172a !important;
+    color: #e5e7eb !important;
+    border-color: #334155 !important;
   }
-  .dark input::placeholder, .dark textarea::placeholder { color: #94a3b8 !important; }
 
-  /* Shaded areas (cards, table headers, chip backgrounds) */
-  .dark .bg-gray-100, .dark thead tr,
-  .dark .bg-gray-50 { background-color: #121212 !important; color: #ffffff !important; }
-  .dark .bg-white { background-color: #0a0a0a !important; color: #ffffff !important; }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #64748b !important;
+  }
 
-  /* Sidebar links and active states */
-  .dark #side-nav a { color: #e5e7eb !important; }
-  .dark #side-nav .bg-blue-100 { background-color: rgba(59,130,246,0.25) !important; color: #ffffff !important; }
-  .dark #side-nav .hover\:bg-gray-200:hover { background-color: #111827 !important; color: #ffffff !important; }
+  .dark label {
+    color: #cbd5e1 !important;
+  }
 
-  /* Chips / badges: ensure high-contrast text */
-  .dark .chip { color: #ffffff !important; }
+  .dark #dd-loan-edit-panel .section-title {
+    color: #cbd5e1 !important;
+  }
 
-  /* Table borders and row hovers */
-  .dark tbody tr { border-color: #2b2b2b !important; }
-  .dark tbody tr:hover { background-color: #0f0f0f !important; }
+  /* Tables */
+  .dark table {
+    color: #e5e7eb;
+  }
 
-  /* KPI captions */
-  .dark .text-gray-500, .dark .text-gray-600, .dark .text-gray-700, .dark .text-gray-900 { color: #ffffff !important; }
+  .dark thead tr {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+  }
+
+  .dark tbody tr {
+    border-color: #334155 !important;
+  }
+
+  .dark tbody tr:hover {
+    background-color: #334155 !important;
+  }
+
+  /* Borders and shadows */
+  .dark .border {
+    border-color: #334155 !important;
+  }
+
+  .dark .border-l-4 {
+    border-color: inherit !important;
+  }
+
+  .dark .shadow {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4) !important;
+  }
+
+  /* Navigation */
+  .dark #side-nav a {
+    color: #cbd5e1 !important;
+  }
+
+  .dark #side-nav a:hover {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+  }
+
+  .dark #side-nav .bg-blue-100 {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+  }
+
+  /* Buttons */
+  .dark button {
+    color: inherit;
+  }
+
+  .dark .text-blue-600 {
+    color: #60a5fa !important;
+  }
+
+  .dark .text-blue-700 {
+    color: #3b82f6 !important;
+  }
+
+  .dark .text-green-700 {
+    color: #22c55e !important;
+  }
+
+  .dark .text-purple-700 {
+    color: #a855f7 !important;
+  }
+
+  .dark .text-red-600 {
+    color: #ef4444 !important;
+  }
+
+  /* Chips / Status badges - maintain color coding with better contrast */
+  .dark .chip {
+    font-weight: 600;
+  }
+
+  .dark .bg-purple-100 {
+    background-color: #7c3aed !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-green-100 {
+    background-color: #16a34a !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-blue-100 {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-yellow-100 {
+    background-color: #ca8a04 !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-orange-100 {
+    background-color: #ea580c !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-red-100 {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-blue-50 {
+    background-color: #1e40af !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-green-50 {
+    background-color: #15803d !important;
+    color: #ffffff !important;
+  }
+
+  .dark .bg-yellow-50 {
+    background-color: #a16207 !important;
+    color: #ffffff !important;
+  }
+
+  /* Theme toggle button */
+  .dark #theme-toggle {
+    border-color: #334155 !important;
+  }
+
+  .dark #theme-toggle:hover {
+    background-color: #334155 !important;
+  }
+
+  /* KPI cards border colors */
+  .dark .border-blue-500 { border-color: #3b82f6 !important; }
+  .dark .border-green-500 { border-color: #22c55e !important; }
+  .dark .border-yellow-500 { border-color: #eab308 !important; }
+
+  /* User avatar */
+  .dark .bg-gray-200 {
+    background-color: #475569 !important;
+    color: #f1f5f9 !important;
+  }
 </style>
 
 </head>
