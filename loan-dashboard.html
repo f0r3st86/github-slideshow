@@ -49,8 +49,111 @@
 
 
 <style>
-  /* Base light mode styles */
-  body { background-color: #f3f4f6; color: #111827; }
+  /* Base light mode styles - explicit for accessibility */
+  body {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+
+  /* Light mode text colors - ensure visibility */
+  h1, h2, h3, h4, h5, h6 { color: #111827; }
+  p, span, div, li, a, td, th { color: inherit; }
+
+  .text-gray-900 { color: #111827; }
+  .text-gray-700 { color: #374151; }
+  .text-gray-600 { color: #4b5563; }
+  .text-gray-500 { color: #6b7280; }
+
+  /* Light mode backgrounds */
+  .bg-white { background-color: #ffffff; color: #111827; }
+  .bg-gray-100 { background-color: #f3f4f6; color: #111827; }
+  .bg-gray-50 { background-color: #f9fafb; color: #111827; }
+
+  /* Light mode form elements */
+  input, select, textarea {
+    background-color: #ffffff;
+    color: #111827;
+    border-color: #d1d5db;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #9ca3af;
+  }
+
+  label {
+    color: #374151;
+  }
+
+  /* Light mode tables */
+  thead tr {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+
+  tbody tr {
+    border-color: #e5e7eb;
+  }
+
+  tbody tr:hover {
+    background-color: #f9fafb;
+  }
+
+  /* Light mode borders */
+  .border {
+    border-color: #e5e7eb;
+  }
+
+  /* Light mode navigation */
+  aside {
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+  }
+
+  #side-nav a {
+    color: #374151;
+  }
+
+  #side-nav a:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+
+  #side-nav .bg-blue-100 {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  /* Light mode buttons */
+  button {
+    color: #111827;
+  }
+
+  /* Light mode chips - maintain color but ensure readability */
+  .chip.bg-purple-100, .bg-purple-100.text-purple-700 { background-color: #e9d5ff !important; color: #6b21a8 !important; }
+  .chip.bg-green-100, .bg-green-100.text-green-700 { background-color: #dcfce7 !important; color: #15803d !important; }
+  .chip.bg-blue-100, .bg-blue-100.text-blue-700 { background-color: #dbeafe !important; color: #1e40af !important; }
+  .chip.bg-yellow-100, .bg-yellow-100.text-yellow-700 { background-color: #fef3c7 !important; color: #a16207 !important; }
+  .chip.bg-orange-100, .bg-orange-100.text-orange-600 { background-color: #ffedd5 !important; color: #c2410c !important; }
+  .chip.bg-red-100, .bg-red-100.text-red-700 { background-color: #fee2e2 !important; color: #991b1b !important; }
+
+  .bg-blue-50 { background-color: #eff6ff; color: #1e3a8a; }
+  .bg-green-50 { background-color: #f0fdf4; color: #14532d; }
+  .bg-yellow-50 { background-color: #fefce8; color: #713f12; }
+
+  /* Light mode color text */
+  .text-blue-600 { color: #2563eb; }
+  .text-blue-700 { color: #1d4ed8; }
+  .text-green-700 { color: #15803d; }
+  .text-purple-700 { color: #7e22ce; }
+  .text-red-600 { color: #dc2626; }
+
+  /* Light mode KPI border colors */
+  .border-blue-500 { border-color: #3b82f6; }
+  .border-green-500 { border-color: #22c55e; }
+  .border-yellow-500 { border-color: #eab308; }
+
+  /* Light mode user avatar */
+  .bg-gray-200 { background-color: #e5e7eb; color: #374151; }
 
   /* Dark mode styles - accessible and properly contrasted */
   .dark body {
